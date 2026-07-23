@@ -16,13 +16,13 @@ Add a tablet-first Adventure Map view to the existing Wordling Rescue client app
 
 **Storage**: Browser `localStorage` under the existing `wordling-rescue-v1` key; compiled static map/story content; no D1, R2, server records, or analytics
 
-**Testing**: Node built-in `node:test` and `assert`, production vinext build, rendered Cloudflare worker smoke test, ESLint, and a documented manual tablet/accessibility pass
+**Testing**: Node built-in `node:test` and `assert`, production vinext build, rendered Cloudflare worker smoke test, ESLint, documented tablet/accessibility and performance checks, and an anonymous aggregate child-usability check
 
 **Target Platform**: Modern tablet browsers in portrait and landscape, responsive mobile/desktop browsers, Cloudflare Workers-hosted PWA with offline fallback
 
 **Project Type**: Single client-heavy web application with a Cloudflare worker build
 
-**Performance Goals**: Derive and render map state without network access; show the saved map within 1 second after local hydration on a representative tablet; respond to map controls within 100 ms excluding optional animation
+**Performance Goals**: In Chromium tablet emulation at 768×1024 with 4× CPU slowdown and a warm local production build, show the saved map within 1 second of navigation and update visible control status within 100 ms, excluding optional animation, in at least 19 of 20 measured runs
 
 **Constraints**: Preserve learning and placement algorithms; retain anonymous device-local storage; tolerate missing, invalid, unavailable, or full storage; support touch and keyboard; respect reduced motion; keep map-to-mission flow within two actions
 
@@ -90,7 +90,9 @@ See [research.md](./research.md). All technical unknowns are resolved and the de
 - Add a static catalog with stable world, location, and story identifiers.
 - Add an optional versioned map record to the existing save and normalize it once during hydration.
 - Derive unlocked/current/next location state from bounded step counts.
-- Apply mission completion, rescue creation, session increment, and map advancement in one pure, idempotent transition keyed by a stable mission completion ID.
+- Apply mission completion, rescue creation, session increment, the existing completion
+  bonus only, and map advancement in one pure, idempotent transition keyed by a stable
+  mission completion ID; preserve the existing per-answer star updates unchanged.
 - Persist a placement-world suggestion until the child chooses Stay or Switch.
 - Present unviewed unlocked stories sequentially and mark them viewed only on close.
 - Keep residents derived from existing rescue records and stable ordering.

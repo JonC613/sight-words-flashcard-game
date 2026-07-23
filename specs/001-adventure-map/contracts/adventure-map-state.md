@@ -59,7 +59,7 @@ completeMission(save, {
   id,
   completedAt,
   rescue,
-  completionStars,
+  completionBonusStars,
 }) => Save
 ```
 
@@ -72,10 +72,13 @@ Preconditions:
 Behavior:
 
 - If `id` equals `adventureMap.lastCompletionId`, returns the input save unchanged.
-- Otherwise atomically increments `sessions`, adds `completionStars`, appends exactly one rescue, records the ID, and:
+- Otherwise atomically increments `sessions`, adds `completionBonusStars` exactly once,
+  appends exactly one rescue, records the ID, and:
   - increments the active world's steps once when the full map is incomplete; or
   - adds no step when all worlds are complete.
 - Ignores answer accuracy, duration, and stars when deciding map progress.
+- Requires `completionBonusStars` to equal the existing bonus of 5 and leaves all
+  previously awarded per-answer stars unchanged.
 - Never increments another world implicitly.
 
 ## `markStoryViewed`

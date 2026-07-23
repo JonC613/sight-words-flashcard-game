@@ -44,10 +44,14 @@ npm test
 - First-step versus second-step location boundaries.
 - Ten-step world and thirty-step full-map boundaries.
 - Duplicate completion IDs producing no duplicate mutation.
+- Existing per-answer stars plus exactly one 5-star completion bonus, with no
+  double-counting.
 - Exactly one next destination.
 - Story close/revisit behavior without rewards.
 - Placement recheck Stay and Switch behavior.
 - Post-full-completion rescue residency with zero new steps.
+- JSON round trips and reload normalization preserving active world, viewed stories,
+  pending placement choice, and resident rescue inputs.
 
 The rendered-worker smoke test confirms the production response includes Adventure Map entry/preview semantics. It does not substitute for hydrated interaction testing.
 
@@ -67,7 +71,9 @@ The rendered-worker smoke test confirms the production response includes Adventu
 | All worlds complete | Later mission adds one resident and zero steps/locations |
 | Placement recheck | Learning result saves first; exactly Stay/Switch choices appear |
 | Repeated completion action | One session, rescue, map step, and story eligibility |
+| Mission star accounting | Existing per-answer stars remain and exactly one 5-star completion bonus is added |
 | Storage unavailable/full | Practice continues in memory with supportive status |
+| Viewed story, residents, or pending recheck choice | Closing and reopening restores the same state |
 
 ## Tablet and accessibility check
 
@@ -91,6 +97,24 @@ Verify:
 - With sound disabled or speech synthesis unavailable, all instructions remain visible.
 - After warming the service worker, an offline reload keeps map content and practice entry usable.
 - Returning after time away shows no missed-day or streak-loss message.
+
+## Performance check
+
+Using a warm local production build in Chromium developer tools:
+
+1. Set the viewport to 768×1024 and CPU throttling to 4× slowdown.
+2. Measure 20 Map navigations from an already hydrated home screen.
+3. Measure the delay from activating a Map control to its visible status update,
+   excluding optional animation.
+4. Confirm at least 19 of 20 runs show Map within 1 second and control status within
+   100 ms; record the browser version, method, and results.
+
+## Child usability check
+
+With grown-up consent, observe at least five children using a representative tablet.
+Record only anonymous aggregate pass/fail outcomes—no names, accounts, audio, video,
+or photographs. At least four of five must identify their current location and next
+destination within 10 seconds without assistance.
 
 ## Requirement trace checkpoints
 

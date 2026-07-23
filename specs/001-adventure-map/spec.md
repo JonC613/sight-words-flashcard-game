@@ -236,8 +236,9 @@ changing learning progress or awarding duplicate rewards.
   and all essential state remains understandable with sound and animation disabled.
 - **SC-005**: A returning learner can resume from the map to a practice mission in no
   more than two actions, regardless of time away.
-- **SC-006**: Map unlocks, story moments, and resident Wordlings remain available after
-  closing and reopening the application on the same device.
+- **SC-006**: The active world, map unlocks, viewed-story status, pending placement
+  choice, and resident Wordlings remain unchanged after closing and reopening the
+  application on the same device.
 - **SC-007**: Repeated activation during an unlock produces zero duplicate map steps,
   locations, stories, stars, or rescued Wordlings.
 - **SC-009**: After full-map completion, every completed mission adds exactly one newly
@@ -268,3 +269,5 @@ changing learning progress or awarding duplicate rewards.
   Wordling while all completed locations remain unchanged.
 - Location and story content ships with the application and remains available offline.
 - The existing anonymous, device-local save remains the only persistence mechanism.
+- Observed usability checks retain only anonymous aggregate outcomes and collect no
+  child names, account data, audio, video, or photographs.

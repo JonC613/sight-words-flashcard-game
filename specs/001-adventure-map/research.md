@@ -49,7 +49,7 @@
 
 ## Decision 5: Make mission completion one idempotent transition
 
-**Decision**: Generate a stable mission ID when a mission starts. A pure `completeMission(save, event)` transition checks `lastCompletionId` and, only once, applies the session increment, rescue, completion bonus, and eligible map step in one functional save update. Retain the existing `finalizing` ref and disable completion controls for immediate tap protection.
+**Decision**: Generate a stable mission ID when a mission starts. A pure `completeMission(save, event)` transition checks `lastCompletionId` and, only once, applies the session increment, rescue, the existing `COMPLETION_BONUS` of 5 stars, and eligible map step in one functional save update. Existing per-answer star updates remain where they are and are not included again in the completion event. Retain the existing `finalizing` ref and disable completion controls for immediate tap protection.
 
 **Rationale**: One atomic transition prevents duplicate steps, locations, rescues, or statistics and is directly testable. The stable ID protects more durably than a render-local ref alone.
 

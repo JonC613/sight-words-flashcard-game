@@ -96,11 +96,14 @@ type MissionCompletionEvent = {
   id: string;
   completedAt: number;
   rescue: Rescue;
-  completionStars: number;
+  completionBonusStars: number;
 };
 ```
 
-The ID is created once when the mission starts and reused through completion. Applying an event whose ID equals `lastCompletionId` returns the save unchanged.
+The ID is created once when the mission starts and reused through completion.
+`completionBonusStars` is exactly the existing `COMPLETION_BONUS` value of 5; it does
+not include stars already awarded per answer. Applying an event whose ID equals
+`lastCompletionId` returns the save unchanged.
 
 ## Static catalog entity
 
@@ -193,7 +196,7 @@ Storage read, parse, or write failure returns a usable normalized in-memory stat
 | Initial placement completes | No map exists | Initialize map from placement and existing sessions | Learning placement remains authoritative only for learning |
 | Mission starts | Active world incomplete, or full map complete | Create one stable mission ID | No progress is awarded |
 | Mission abandons | Mission not completed | Discard active mission ID | Zero map steps and zero rescues |
-| Mission completes | New completion ID | Atomically add session/rescue/stars and either add one active-world step or, after full completion, add no step | Exactly-once behavior; accuracy/speed irrelevant |
+| Mission completes | New completion ID | Atomically add session/rescue/completion bonus and either add one active-world step or, after full completion, add no step; preserve prior per-answer stars | Exactly-once behavior; accuracy/speed irrelevant |
 | Duplicate completion | ID equals `lastCompletionId` | Return save unchanged | No duplicate session, rescue, step, story, or location |
 | First step toward location | Active steps are even and below 10 | Increment to odd step | Location remains next |
 | Second step toward location | Active steps are odd and below 10 | Increment to even step | Exactly one location becomes unlocked |

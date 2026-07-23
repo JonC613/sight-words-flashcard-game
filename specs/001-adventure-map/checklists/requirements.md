@@ -31,6 +31,6 @@
 
 ## Notes
 
-- Validation passed on the first review.
+- Validation passed on the first review and again after the 2026-07-23 analysis remediation.
 - The specification intentionally rewards mission completion rather than accuracy,
   speed, or consecutive-day activity.

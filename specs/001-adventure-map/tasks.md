@@ -68,12 +68,12 @@
 
 ### Tests for User Story 2
 
-- [ ] T013 [US2] Add failing transition tests for abandonment, accuracy-independent completion, steps 1/2 and 9/10, duplicate completion IDs, story close/revisit, world selection, and thirty-step full-map behavior in `tests/adventure-map.test.mjs`
+- [ ] T013 [US2] Add failing transition tests for abandonment, accuracy-independent completion, bonus-only star accounting, steps 1/2 and 9/10, duplicate completion IDs, story close/revisit, world selection, and thirty-step full-map behavior in `tests/adventure-map.test.mjs`
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] Implement idempotent `completeMission`, `markStoryViewed`, and `chooseWorld` transitions with a stable completion ID and atomic session/rescue/star/map updates in `app/adventure-map.js`
-- [ ] T015 [US2] Generate one stable mission ID at mission start and replace separate finale save mutations with the pure atomic completion transition in `app/page.tsx`
+- [ ] T014 [US2] Implement idempotent `completeMission`, `markStoryViewed`, and `chooseWorld` transitions with a stable completion ID and atomic session/rescue/map updates that add only the existing 5-star completion bonus in `app/adventure-map.js`
+- [ ] T015 [US2] Generate one stable mission ID at mission start, preserve existing per-answer star updates, and replace separate finale mutations with one completion transition that cannot add the displayed mission total twice in `app/page.tsx`
 - [ ] T016 [P] [US2] Implement sequential accessible story and world-completion choice surfaces with focus return, Escape handling, rereading, and no reward side effects in `app/adventure-map.tsx`
 - [ ] T017 [US2] Return the finale to the committed Map state, announce one step/unlock, and gate a new mission behind an incomplete-world choice when the active world is complete in `app/page.tsx`
 - [ ] T018 [US2] Add brief progress/reveal/dialog styles and explicit reduced-motion fallbacks that do not control persistence or sequencing in `app/globals.css`
@@ -90,7 +90,7 @@
 
 ### Tests for User Story 3
 
-- [ ] T019 [US3] Add failing tests for deterministic resident assignment, legacy rescue preservation, placement suggestion persistence, Stay/Switch resolution, repeated rechecks, and post-full-completion resident rewards in `tests/adventure-map.test.mjs`
+- [ ] T019 [US3] Add failing tests for deterministic resident assignment, legacy rescue preservation, placement suggestion persistence, Stay/Switch resolution, repeated rechecks, post-full-completion resident rewards, and JSON round trips preserving active world, viewed stories, pending choice, and resident inputs in `tests/adventure-map.test.mjs`
 
 ### Implementation for User Story 3
 
@@ -112,7 +112,9 @@
 - [ ] T026 Audit child-facing map, story, choice, storage-error, and return copy against the constitution's safety and ADHD-friendly rules in `app/adventure-map.tsx` and `app/page.tsx`
 - [ ] T027 Verify accessible names for icon-only controls, keyboard/focus behavior, visible non-color states, zoom, reduced motion, sound-off fallback, and touch target sizes in `app/adventure-map.tsx`, `app/page.tsx`, `app/layout.tsx`, and `app/globals.css`
 - [ ] T028 Run `npm run lint` and `npm test`, resolve failures without weakening assertions, and record automated results in `specs/001-adventure-map/checklists/adventure-map-acceptance.md`
-- [ ] T029 Execute the 768×1024, 1024×768, 320 px, offline, storage-failure, keyboard, and reduced-motion checks from `quickstart.md` and record evidence in `specs/001-adventure-map/checklists/adventure-map-acceptance.md`
+- [ ] T029 Execute the 768×1024, 1024×768, 320 px, offline, storage-failure, close/reopen persistence, keyboard, and reduced-motion checks from `quickstart.md` and record evidence in `specs/001-adventure-map/checklists/adventure-map-acceptance.md`
+- [ ] T030 With grown-up consent, conduct the anonymous aggregate usability check with at least five children and record whether at least four identify current and next locations within 10 seconds in `specs/001-adventure-map/checklists/adventure-map-acceptance.md`
+- [ ] T031 Measure 20 warm-cache Map navigations and control updates under the documented Chromium 768×1024 4× CPU profile and record whether the 1-second/100-ms targets pass in `specs/001-adventure-map/checklists/adventure-map-acceptance.md`
 
 ---
 
