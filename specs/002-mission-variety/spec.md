@@ -12,7 +12,7 @@
 
 ### Session 2026-07-23
 
-- Q: How should the learner supply the missing letter? → A: Choose the missing letter from 3–4 options.
+- Q: How should the learner supply the missing letter? → A: Choose the missing letter from 3–4 options; this feature standardizes on four.
 - Q: How often must a new activity appear in a mission? → A: Include at least one new activity whenever eligible.
 - Q: How should a word answered incorrectly in a new activity be retried? → A: Retry later using a different eligible activity.
 - Q: What is the minimum word length for Missing Letter? → A: Allow words with two or more letters.
@@ -39,7 +39,7 @@ supportive feedback, and advances through the existing mission.
 1. **Given** a learner has words selected for a mission, **When** the mission is
    composed, **Then** eligible words may be presented as Missing Letter or Word
    Hunt activities without changing the selected word set.
-2. **Given** a Missing Letter activity with three or four letter choices, **When**
+2. **Given** a Missing Letter activity with four letter choices, **When**
    the learner selects the missing letter correctly, **Then** the answer is
    recorded as correct and the full word is reinforced.
 3. **Given** a Word Hunt activity, **When** the learner selects the target word,
@@ -112,8 +112,9 @@ answers, and feedback remain understandable and no extra rewards are granted.
   or fall back to another activity.
 - One-letter words are ineligible for Missing Letter. Words with two or more
   letters remain eligible only when the prompt has exactly one valid answer.
-- Distractor words in Word Hunt must be previously introduced to the learner,
-  visually distinct, valid sight words, and must not include duplicate choices.
+- Distractor words in Word Hunt must be previously introduced valid sight words.
+  After lowercase alphabetic normalization, every pair of choices must be unique
+  and have a Damerau-Levenshtein edit distance of at least two.
 - When too few suitable previously introduced distractors exist, the activity must
   use another existing activity rather than use unseen words or lower answer
   quality.
@@ -158,7 +159,7 @@ answers, and feedback remain understandable and no extra rewards are granted.
   review timing. Missing Letter and Word Hunt each count as a distinct activity
   mode toward that unchanged threshold.
 - **FR-004**: Missing Letter MUST show enough of the target word to identify one
-  omitted letter position and MUST present three or four selectable letter choices
+  omitted letter position and MUST present exactly four selectable letter choices
   containing exactly one correct completion.
 - **FR-005**: Missing Letter MUST accept words with two or more letters when a
   clear prompt with exactly one valid answer can be created. One-letter words and
@@ -166,8 +167,10 @@ answers, and feedback remain understandable and no extra rewards are granted.
 - **FR-006**: Word Hunt MUST present one target sight word and a bounded set of two
   to four distinct written choices containing exactly one correct answer.
 - **FR-007**: Word Hunt distractors MUST be valid sight words already introduced
-  to the learner and sufficiently distinct to avoid duplicate or visually
-  indistinguishable choices. Unseen words MUST NOT be used as distractors.
+  to the learner. After converting each choice to lowercase and removing
+  non-alphabetic characters, every pair MUST be unique and have a
+  Damerau-Levenshtein edit distance of at least two. Unseen words MUST NOT be used
+  as distractors.
 - **FR-008**: Each new activity MUST record correct and incorrect responses through
   the same learning outcome used by existing mission activities.
 - **FR-009**: Correct responses MUST preserve the existing per-answer reward.

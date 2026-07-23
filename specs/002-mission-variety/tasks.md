@@ -60,8 +60,8 @@ outcome once, and appends a different-mode retry after a miss.
 
 > Write these tests first and confirm they fail before implementation.
 
-- [ ] T004 [US1] Add failing Missing Letter tests for two-letter words, apostrophes, repeated letters, one omitted position, three-to-four distinct choices, one answer, deterministic randomness, and one-letter fallback in `tests/mission-variety.test.mjs`
-- [ ] T005 [US1] Add failing Word Hunt tests for two-to-four distinct choices, one target, same-grade preference, introduced-only distractors, deterministic randomness, and insufficient-distractor fallback in `tests/mission-variety.test.mjs`
+- [ ] T004 [US1] Add failing Missing Letter tests for two-letter words, apostrophes, repeated letters, one omitted position, exactly four distinct choices, one answer, deterministic randomness, and one-letter fallback in `tests/mission-variety.test.mjs`
+- [ ] T005 [US1] Add failing Word Hunt tests for two-to-four choices, one target, same-grade preference, introduced-only distractors, pairwise normalized Damerau-Levenshtein distance of at least two, deterministic randomness, and insufficient-distractor fallback in `tests/mission-variety.test.mjs`
 - [ ] T006 [US1] Add failing tests for base activity-card composition, immutable selected words/order, different-mode appended retry, retry-only-once behavior, and the 12-card cap in `tests/mission-variety.test.mjs`
 
 ### Implementation for User Story 1
@@ -121,7 +121,7 @@ completion reward or map progress after abandonment.
 
 > Write these tests first and confirm they fail before implementation.
 
-- [ ] T018 [US3] Add failing compatibility tests for old three-mode progress, JSON round trips with new modes, malformed optional prompt data, and introduced-word detection in `tests/mission-variety.test.mjs`
+- [ ] T018 [US3] Add failing compatibility tests for old three-mode progress, JSON round trips with new modes, malformed or unknown mode-history entries, and introduced-word detection in `tests/mission-variety.test.mjs`
 - [ ] T019 [US3] Add failing pure-transition tests for rapid duplicate answers, learning updates, appended retries, abandonment without save mutation, and single-finale boundaries in `tests/mission-session.test.mjs`, `tests/mission-finale.test.mjs`, and `tests/adventure-map.test.mjs`
 
 ### Implementation for User Story 3
@@ -144,7 +144,7 @@ performance, and release requirements.
 - [ ] T024 [P] Review all child-facing instructions, feedback, rewards, and retry behavior against Constitution Principles II/III and record the result in `specs/002-mission-variety/validation.md`
 - [ ] T025 Run `npm run lint` and `npm test`, resolve any failures in the affected `app/` or `tests/` files, and record final command results in `specs/002-mission-variety/validation.md`
 - [ ] T026 Measure 1,000 eight-card compositions and 20 warm-browser feedback interactions against the plan’s p95/100ms targets and record method/results in `specs/002-mission-variety/validation.md`
-- [ ] T027 Conduct the consented five-child anonymous aggregate comprehension/comfort check for SC-005/SC-006, collecting no names or media, and record only aggregate results in `specs/002-mission-variety/validation.md`
+- [ ] T027 Assign the product owner to complete the grown-up-consented five-child anonymous aggregate comprehension/comfort release gate for SC-005/SC-006, collecting no names or media, and record only aggregate results in `specs/002-mission-variety/validation.md`
 - [ ] T028 Verify every FR-001–FR-018 and SC-001–SC-008 has implementation or validation evidence and complete the traceability table in `specs/002-mission-variety/validation.md`
 
 ---

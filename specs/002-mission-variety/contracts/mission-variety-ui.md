@@ -18,7 +18,7 @@ The card provides:
 
 - Visible instruction such as `Find the missing letter`.
 - The target word with one clearly marked missing position.
-- Three or four native letter buttons.
+- Exactly four native letter buttons.
 - Exactly one button that reconstructs the target word.
 - A visible focus indicator and at least 44×44 CSS-pixel targets.
 - The full word in the shared feedback surface.

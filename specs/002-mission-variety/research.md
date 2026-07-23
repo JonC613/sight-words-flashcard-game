@@ -53,10 +53,9 @@ is forward-compatible JSON, and old saves require no migration.
 ## Decision 4: Generate Missing Letter prompts from letter positions
 
 **Decision**: Eligible targets contain at least two alphabetic characters. Omit
-one alphabetic position, retain punctuation such as apostrophes, and present four
-distinct lowercase letter buttons (three only if a defensive input constraint
-prevents four), including exactly one correct letter. Injected randomness selects
-the position and shuffles choices.
+one alphabetic position, retain punctuation such as apostrophes, and present
+exactly four distinct lowercase letter buttons including exactly one correct
+letter. Injected randomness selects the position and shuffles choices.
 
 **Rationale**: A visible position makes repeated-letter words unambiguous, keeps
 two-letter words supported, and produces a bounded tablet interaction.
@@ -70,9 +69,11 @@ two-letter words supported, and produces a bounded tablet interaction.
 ## Decision 5: Restrict Word Hunt distractors to introduced words
 
 **Decision**: A word is introduced when it has an entry in `Save.progress`.
-Choose distinct introduced catalog words other than the target, preferring the
-target grade before other grades. Produce two to four total written choices with
-exactly one target; fall back when fewer than one suitable distractor exists.
+Choose introduced catalog words other than the target, preferring the target
+grade before other grades. Normalize choices to lowercase alphabetic characters
+and require pairwise Damerau-Levenshtein distance of at least two. Produce two to
+four total written choices with exactly one target; fall back when fewer than one
+suitable distractor exists.
 
 **Rationale**: This prevents unseen words from confusing the learner while using
 familiar alternatives to make recognition meaningful.

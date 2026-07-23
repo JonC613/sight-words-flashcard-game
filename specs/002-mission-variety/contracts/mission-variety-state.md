@@ -14,7 +14,7 @@ Guarantees:
 - Returns `null` for words with fewer than two alphabetic characters or when a
   valid prompt cannot be formed.
 - Omits exactly one alphabetic position and preserves punctuation.
-- Returns three or four distinct lowercase letter choices containing the answer
+- Returns exactly four distinct lowercase letter choices containing the answer
   exactly once.
 - Uses only the injected random source for position and choice order.
 
@@ -27,7 +27,8 @@ createWordHuntPrompt(target, progress, catalog, random) => WordHuntPrompt | null
 Guarantees:
 
 - Uses only catalog distractors with an existing `progress` entry.
-- Excludes the target and duplicate normalized words.
+- Excludes the target and requires pairwise distance of at least two after
+  lowercase alphabetic normalization, using Damerau-Levenshtein distance.
 - Prefers same-grade distractors.
 - Returns two to four total choices with the target exactly once.
 - Returns `null` rather than using an unseen or invalid distractor.

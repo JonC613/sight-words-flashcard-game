@@ -113,7 +113,7 @@ Rules:
 - The target has at least two alphabetic characters.
 - `missingIndex` identifies exactly one alphabetic character in the original word.
 - Joining `displayParts` around `answer` reconstructs the target.
-- `choices.length` is three or four; normalized values are distinct.
+- `choices.length` is exactly four; normalized values are distinct.
 - `choices` contains `answer` exactly once.
 - Punctuation not at the omitted position remains visible.
 
@@ -130,7 +130,8 @@ type WordHuntPrompt = {
 Rules:
 
 - `choices.length` is two through four.
-- Choices are distinct catalog words.
+- Choices are catalog words whose lowercase alphabetic normalized forms are unique
+  and have pairwise Damerau-Levenshtein distance of at least two.
 - `target` appears exactly once.
 - Every distractor differs from the target and has an existing progress record.
 - Same-grade distractors are preferred but not required.

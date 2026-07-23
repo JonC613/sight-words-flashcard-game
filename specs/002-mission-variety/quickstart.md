@@ -48,7 +48,7 @@ The Mission Variety unit tests must cover:
 - Selected word identity and order remain unchanged.
 - Due/new selection output is identical before activity assignment.
 - Missing Letter accepts two-letter and apostrophe words.
-- Missing Letter has one omitted position, three or four distinct choices, and
+- Missing Letter has one omitted position, exactly four distinct choices, and
   exactly one correct answer.
 - One-letter or otherwise invalid prompts fall back.
 - Word Hunt uses only introduced catalog words and exactly one target.
@@ -98,11 +98,13 @@ speech.
 
 ## Child usability check
 
-With grown-up consent, observe at least five children using both activities on a
-representative tablet. Record anonymous aggregate outcomes only. At least four of
-five should begin each activity without adult explanation, and at least four of
-five should report the varied mission as equally comfortable or more interesting.
-No child should report pressure from time or loss mechanics.
+Before production release, the product owner coordinates a grown-up-consented
+observation of at least five children using both activities on a representative
+tablet. Record anonymous aggregate outcomes only. At least four of five should
+begin each activity without adult explanation, and at least four of five should
+report the varied mission as equally comfortable or more interesting. No child
+should report pressure from time or loss mechanics. This external gate does not
+block automated implementation work.
 
 ## Requirement trace checkpoints
 
