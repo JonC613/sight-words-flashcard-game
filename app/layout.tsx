@@ -18,6 +18,6 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: { card:"summary_large_image", title:"Wordling Rescue", description:"A playful, adaptive sight-word adventure.", images:[image] },
   };
 }
-export const viewport: Viewport = { width:"device-width", initialScale:1, maximumScale:1, themeColor:"#fff8eb" };
+export const viewport: Viewport = { width:"device-width", initialScale:1, themeColor:"#fff8eb" };
 export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="en"><body>{children}</body></html>}
 
