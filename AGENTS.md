@@ -1,3 +1,3 @@
 <!-- SPECKIT START -->
-For Adventure Map technology choices, project structure, commands, contracts, and verification guidance, read `specs/001-adventure-map/plan.md`.
+For Mission Variety technology choices, project structure, commands, contracts, and verification guidance, read `specs/002-mission-variety/plan.md`.
 <!-- SPECKIT END -->
