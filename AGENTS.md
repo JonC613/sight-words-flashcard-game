@@ -1,4 +1,3 @@
 <!-- SPECKIT START -->
-For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan
+For Adventure Map technology choices, project structure, commands, contracts, and verification guidance, read `specs/001-adventure-map/plan.md`.
 <!-- SPECKIT END -->
