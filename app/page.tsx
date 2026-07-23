@@ -1,15 +1,19 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { summarizeMission } from "./mission-finale";
 import { Grade, learningOrder, lists, SightWord, words } from "./words";
 
 type Mode = "read" | "choice" | "spell";
-type View = "home" | "mission" | "placement" | "collection" | "parent";
+type View = "home" | "mission" | "finale" | "placement" | "collection" | "parent";
 type Progress = { stage:number; due:number; attempts:number; correct:number; modes:Mode[]; mastered:boolean };
 type Placement = { completed:boolean; completedAt:number; startingGrade:Grade; attempts:number; correct:number };
-type Save = { name:string; stars:number; sessions:number; sound:boolean; progress:Record<string,Progress>; placement?:Placement };
+type Rescue = { id:string; world:Grade; rescuedAt:number };
+type Save = { name:string; stars:number; sessions:number; sound:boolean; progress:Record<string,Progress>; placement?:Placement; rescues?:Rescue[] };
 type Card = { word:SightWord; mode:Mode; retry?:boolean };
 type PlacementAnswer = { word:SightWord; mode:Mode; ok:boolean };
+type MissionAnswer = { word:string; ok:boolean };
+type MissionResult = { strengthened:string[]; practiceSoon:string[]; starsEarned:number; rescue:Rescue };
 
 const DAY=86_400_000, intervals=[0,1,3,7,14,30,60];
 const fresh:Save={name:"Explorer",stars:0,sessions:0,sound:true,progress:{}};
@@ -36,6 +40,8 @@ function Creature({small=false}:{small?:boolean}){return <div className={"creatu
 export default function Page(){
   const [save,setSave]=useState<Save>(fresh),[ready,setReady]=useState(false),[view,setView]=useState<View>("home"),[cards,setCards]=useState<Card[]>([]),[index,setIndex]=useState(0),[feedback,setFeedback]=useState<{ok:boolean;answer:string}|null>(null),[typed,setTyped]=useState(""),[filter,setFilter]=useState<Grade|"All">("All");
   const [placementPhase,setPlacementPhase]=useState<"intro"|"questions"|"result">("intro"),[placementCards,setPlacementCards]=useState<Card[]>([]),[placementIndex,setPlacementIndex]=useState(0),[placementAnswers,setPlacementAnswers]=useState<PlacementAnswer[]>([]),[placementFeedback,setPlacementFeedback]=useState<{ok:boolean;answer:string}|null>(null),[placementGrade,setPlacementGrade]=useState<Grade>("Second");
+  const [missionAnswers,setMissionAnswers]=useState<MissionAnswer[]>([]),[missionResult,setMissionResult]=useState<MissionResult|null>(null);
+  const finalizing=useRef(false);
   useEffect(()=>{const raw=localStorage.getItem("wordling-rescue-v1");let loaded=fresh;if(raw)try{loaded={...fresh,...JSON.parse(raw)};setSave(loaded)}catch{}if(!loaded.placement?.completed)setView("placement");setReady(true);if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{})},[]);
   useEffect(()=>{if(ready)localStorage.setItem("wordling-rescue-v1",JSON.stringify(save))},[save,ready]);
   const current=cards[index],mastered=Object.values(save.progress).filter(p=>p.mastered).length,learning=Object.values(save.progress).filter(p=>!p.mastered).length,due=Object.values(save.progress).filter(p=>p.due<=Date.now()).length;
@@ -43,7 +49,7 @@ export default function Page(){
   const placementCurrent=placementCards[placementIndex];
   const placementChoices=useMemo(()=>placementCurrent?.mode==="choice"?shuffle([placementCurrent.word,...shuffle(words.filter(w=>w.grade===placementCurrent.word.grade&&w.word!==placementCurrent.word.word)).slice(0,2)]):[],[placementCurrent]);
 
-  function start(){setCards(makeMission(save.progress));setIndex(0);setFeedback(null);setTyped("");setView("mission")}
+  function start(){finalizing.current=false;setMissionAnswers([]);setMissionResult(null);setCards(makeMission(save.progress));setIndex(0);setFeedback(null);setTyped("");setView("mission")}
   function openPlacement(){setPlacementPhase("intro");setPlacementCards([]);setPlacementIndex(0);setPlacementAnswers([]);setPlacementFeedback(null);setTyped("");setView("placement")}
   function beginPlacement(){setPlacementCards(placementSet("Second"));setPlacementIndex(0);setPlacementAnswers([]);setPlacementFeedback(null);setTyped("");setPlacementPhase("questions")}
   function finishPlacement(answers:PlacementAnswer[],branch:Grade){const branchCorrect=answers.slice(4).filter(a=>a.ok).length;const grade:Grade=branch==="Third"?(branchCorrect>=3?"Third":"Second"):(branchCorrect>=3?"Second":"First"),now=Date.now();setSave(s=>{const progress={...s.progress};for(const a of answers){const old=progress[a.word.word];if(old){progress[a.word.word]={...old,due:a.ok?old.due:Math.min(old.due,now),attempts:old.attempts+1,correct:old.correct+(a.ok?1:0),modes:Array.from(new Set([...old.modes,a.mode]))}}else progress[a.word.word]={stage:a.ok?2:0,due:a.ok?now+DAY:now,attempts:1,correct:a.ok?1:0,modes:[a.mode],mastered:false}}return {...s,progress,placement:{completed:true,completedAt:now,startingGrade:grade,attempts:answers.length,correct:answers.filter(a=>a.ok).length}}});setPlacementGrade(grade);setPlacementPhase("result")}
@@ -51,8 +57,9 @@ export default function Page(){
   function nextPlacement(){const nextIndex=placementIndex+1;if(nextIndex===4&&placementCards.length===4){const branch:Grade=placementAnswers.filter(a=>a.ok).length>=3?"Third":"First";setPlacementCards(c=>[...c,...placementSet(branch)])}if(nextIndex>=8){finishPlacement(placementAnswers,placementCards[4]?.word.grade??"First");return}setPlacementIndex(nextIndex);setPlacementFeedback(null);setTyped("")}
   function checkPlacement(e:FormEvent){e.preventDefault();if(typed.trim())answerPlacement(typed.trim().toLowerCase()===placementCurrent.word.word)}
   const placementComplete=!!save.placement?.completed;
-  function answer(ok:boolean){if(!current||feedback)return;const name=current.word.word,old=save.progress[name]??{stage:0,due:Date.now(),attempts:0,correct:0,modes:[],mastered:false};const stage=ok?Math.min(6,old.stage+1):Math.max(0,old.stage-1),modes=Array.from(new Set([...old.modes,current.mode]));setSave(s=>({...s,stars:s.stars+(ok?3:1),progress:{...s.progress,[name]:{stage,due:ok?Date.now()+intervals[stage]*DAY:Date.now(),attempts:old.attempts+1,correct:old.correct+(ok?1:0),modes,mastered:stage>=5&&modes.length>=3}}}));if(!ok&&!current.retry&&cards.length<12)setCards(c=>[...c,{word:current.word,mode:"read",retry:true}]);setFeedback({ok,answer:name});if(ok)say("Great remembering!",save.sound)}
-  function next(){if(index+1>=cards.length){setSave(s=>({...s,sessions:s.sessions+1}));setCards([]);setView("home");return}setIndex(i=>i+1);setFeedback(null);setTyped("")}
+  function answer(ok:boolean){if(!current||feedback)return;const name=current.word.word;setMissionAnswers(a=>[...a,{word:name,ok}]);const old=save.progress[name]??{stage:0,due:Date.now(),attempts:0,correct:0,modes:[],mastered:false};const stage=ok?Math.min(6,old.stage+1):Math.max(0,old.stage-1),modes=Array.from(new Set([...old.modes,current.mode]));setSave(s=>({...s,stars:s.stars+(ok?3:1),progress:{...s.progress,[name]:{stage,due:ok?Date.now()+intervals[stage]*DAY:Date.now(),attempts:old.attempts+1,correct:old.correct+(ok?1:0),modes,mastered:stage>=5&&modes.length>=3}}}));if(!ok&&!current.retry&&cards.length<12)setCards(c=>[...c,{word:current.word,mode:"read",retry:true}]);setFeedback({ok,answer:name});if(ok)say("Great remembering!",save.sound)}
+  function finishMission(){if(finalizing.current)return;finalizing.current=true;const {strengthened,practiceSoon,starsEarned}=summarizeMission(missionAnswers),world=save.placement?.startingGrade??current?.word.grade??"First",rescuedAt=Date.now(),rescue:Rescue={id:"rescue-"+rescuedAt+"-"+(save.sessions+1),world,rescuedAt};setMissionResult({strengthened,practiceSoon,starsEarned,rescue});setSave(s=>({...s,stars:s.stars+5,sessions:s.sessions+1,rescues:[...(s.rescues??[]),rescue]}));setCards([]);setView("finale");say("Mission complete! A Wordling is home!",save.sound)}
+  function next(){if(index+1>=cards.length){finishMission();return}setIndex(i=>i+1);setFeedback(null);setTyped("")}
   function check(e:FormEvent){e.preventDefault();if(typed.trim())answer(typed.trim().toLowerCase()===current.word.word)}
 
   return <main className={"app "+view}>
@@ -84,11 +91,25 @@ export default function Page(){
       {feedback&&<div className={"feedback "+(feedback.ok?"good":"help")} role="status"><div><b>{feedback.ok?"Brilliant remembering!":"Let’s map it together."}</b><span>{feedback.ok?"“"+feedback.answer+"” grew stronger.":"The word is “"+feedback.answer+"”. Say it, then trace the letters."}</span></div><button className="primary" onClick={next}>{index+1>=cards.length?"Finish mission":"Next word"} →</button></div>}
     </div></section>}
 
-    {view==="collection"&&<section className="subpage"><div className="subhead"><div><small className="eyebrow">WORDLING COLLECTION</small><h1>Every word has a home.</h1><p>Practice across different days to help each Wordling grow.</p></div><Creature/></div><div className="filters">{(["All","First","Second","Third"] as const).map(f=><button className={filter===f?"on":""} onClick={()=>setFilter(f)} key={f}>{f}{f==="All"?" words":" grade"}</button>)}</div><div className="collection">{words.filter(w=>filter==="All"||w.grade===filter).map(w=>{const p=save.progress[w.word];return <article className={p?.mastered?"mastered":p?"learning":"locked"} key={w.word}><i>{p?.mastered?"★":p?"✦":"·"}</i><b>{p?w.word:"???"}</b><small>{p?.mastered?"Mastered":p?"Level "+p.stage:w.grade}</small></article>})}</div></section>}
+    {view==="finale"&&missionResult&&<section className="missionFinale">
+      <div className="finaleBurst" aria-hidden="true"><span>✦</span><span>★</span><span>✦</span></div>
+      <div className={"finaleRescue trail"+missionResult.rescue.world}><Creature/></div>
+      <small className="eyebrow">MISSION COMPLETE</small>
+      <h1>A Wordling is home!</h1>
+      <p>You followed every clue and made your trail stronger.</p>
+      <div className="finaleReward"><span><b>+{missionResult.starsEarned}</b> stars earned</span><span><b>+1</b> Wordling rescued</span></div>
+      <div className="learningSummary">
+        <article><i>✦</i><div><small>GREW STRONGER</small><div className="wordChips">{missionResult.strengthened.length?missionResult.strengthened.map(word=><b key={word}>{word}</b>):<span>Every clue helped your trail grow.</span>}</div></div></article>
+        <article><i>↻</i><div><small>PRACTICE COMING SOON</small><div className="wordChips">{missionResult.practiceSoon.length?missionResult.practiceSoon.map(word=><b key={word}>{word}</b>):<span>You’re all caught up for now.</span>}</div><p>These words will return sooner so they can grow.</p></div></article>
+      </div>
+      <div className="finaleActions"><button className="primary" onClick={()=>setView("home")}>Return to my trail →</button><button onClick={()=>setView("collection")}>Visit my Wordlings</button></div>
+    </section>}
+
+    {view==="collection"&&<section className="subpage"><div className="subhead"><div><small className="eyebrow">WORDLING COLLECTION</small><h1>Every word has a home.</h1><p>Practice across different days to help each Wordling grow.</p></div><Creature/></div><div className="rescuedShelf"><div><small className="eyebrow">RESCUED WORDLINGS</small><h2>{save.rescues?.length??0} safe at home</h2></div><div className="rescueRow">{(save.rescues??[]).slice(-6).reverse().map(rescue=><div className={"miniRescue trail"+rescue.world} key={rescue.id}><Creature small/><span>{worldName(rescue.world)}</span></div>)}{!save.rescues?.length&&<p>Complete a mission to rescue your first Wordling.</p>}</div></div><div className="filters">{(["All","First","Second","Third"] as const).map(f=><button className={filter===f?"on":""} onClick={()=>setFilter(f)} key={f}>{f}{f==="All"?" words":" grade"}</button>)}</div><div className="collection">{words.filter(w=>filter==="All"||w.grade===filter).map(w=>{const p=save.progress[w.word];return <article className={p?.mastered?"mastered":p?"learning":"locked"} key={w.word}><i>{p?.mastered?"★":p?"✦":"·"}</i><b>{p?w.word:"???"}</b><small>{p?.mastered?"Mastered":p?"Level "+p.stage:w.grade}</small></article>})}</div></section>}
 
     {view==="parent"&&<section className="subpage parent"><small className="eyebrow">GROWN-UP AREA</small><h1>Learning at a glance</h1><p>Progress stays on this device. Review timing adapts after every answer.</p><div className="parentgrid"><article><h2>Explorer settings</h2><label>Player name<input value={save.name} maxLength={18} onChange={e=>setSave(s=>({...s,name:e.target.value||"Explorer"}))}/></label><label className="toggle">Sound and spoken words<input type="checkbox" checked={save.sound} onChange={e=>setSave(s=>({...s,sound:e.target.checked}))}/></label><div className="placementSummary"><small>STARTING TRAIL</small><b>{save.placement?.completed?worldName(save.placement.startingGrade):"Not set yet"}</b><button onClick={openPlacement}>{save.placement?.completed?"Recheck starting level":"Start Placement Quest"}</button></div></article><article><h2>Current picture</h2><div className="numbers"><span><b>{mastered}</b>mastered</span><span><b>{learning}</b>learning</span><span><b>{due}</b>due now</span></div><div className="track"><i style={{width:mastered/words.length*100+"%"}}/></div><small>{mastered} of {words.length} Dolch words securely learned</small></article><article className="wide"><h2>Words needing a little help</h2><div className="trouble">{Object.entries(save.progress).filter(([,p])=>p.attempts-p.correct>0).sort((a,b)=>(b[1].attempts-b[1].correct)-(a[1].attempts-a[1].correct)).slice(0,8).map(([word,p])=><span key={word}><b>{word}</b>{p.correct}/{p.attempts} correct</span>)}{!Object.values(save.progress).some(p=>p.attempts-p.correct>0)&&<p>Missed words will appear here after a mission.</p>}</div></article></div><button className="reset" onClick={()=>{if(confirm("Reset all progress on this device?"))setSave(fresh)}}>Reset progress</button></section>}
 
-    {view!=="mission"&&view!=="placement"&&<nav><button className={view==="home"?"on":""} onClick={()=>setView("home")}><b>⌂</b>Home</button><button onClick={placementComplete?start:openPlacement}><b>▶</b>Play</button><button className={view==="collection"?"on":""} onClick={()=>setView("collection")}><b>◇</b>Wordlings</button><button className={view==="parent"?"on":""} onClick={()=>setView("parent")}><b>▦</b>Grown-ups</button></nav>}
+    {view!=="mission"&&view!=="placement"&&view!=="finale"&&<nav><button className={view==="home"?"on":""} onClick={()=>setView("home")}><b>⌂</b>Home</button><button onClick={placementComplete?start:openPlacement}><b>▶</b>Play</button><button className={view==="collection"?"on":""} onClick={()=>setView("collection")}><b>◇</b>Wordlings</button><button className={view==="parent"?"on":""} onClick={()=>setView("parent")}><b>▦</b>Grown-ups</button></nav>}
   </main>
 }
 
