@@ -1,6 +1,6 @@
 # Contract: Adventure Map State Module
 
-The pure state module is imported by `app/page.tsx`, `app/adventure-map.tsx`, and Node tests. It performs no DOM, storage, speech, animation, network, or clock access. Callers provide time and IDs explicitly.
+The pure state module is imported by `app/page.tsx`, `app/adventure-map-view.tsx`, and Node tests. It performs no DOM, storage, speech, animation, network, or clock access. Callers provide time and IDs explicitly.
 
 ## Catalog export
 

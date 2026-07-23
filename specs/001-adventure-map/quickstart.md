@@ -12,7 +12,7 @@ No database, Cloudflare binding, account, analytics service, or new runtime depe
 
 1. Add the pure catalog, normalization, selector, and transition functions in `app/adventure-map.js`.
 2. Add `tests/adventure-map.test.mjs` and include it explicitly in the `npm test` script.
-3. Add the semantic map, story, and world-choice UI in `app/adventure-map.tsx`.
+3. Add the semantic map, story, and world-choice UI in `app/adventure-map-view.tsx`.
 4. Extend `Save`, navigation, placement completion, and mission completion in `app/page.tsx`.
 5. Add responsive/reduced-motion styles in `app/globals.css` and restore browser zoom in `app/layout.tsx`.
 6. Extend the rendered-worker smoke test.
