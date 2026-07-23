@@ -198,3 +198,10 @@ test("JSON round trips retain map, viewed stories, pending choice, and resident 
   assert.deepEqual(reopened, save);
   assert.deepEqual(deriveResidents(reopened), deriveResidents(save));
 });
+test("activity metadata cannot change Adventure Map completion",()=>{
+  const save=normalizeAdventureMap({...baseSave(0,"First"),stars:0});
+  const base={id:"activity-neutral",completedAt:900,rescue:{id:"rescue-neutral",world:"First",rescuedAt:900},completionBonusStars:5};
+  const plain=completeMission(save,base);
+  const varied=completeMission(save,{...base,activityMix:["missing-letter","word-hunt"]});
+  assert.deepEqual(varied,plain);
+});

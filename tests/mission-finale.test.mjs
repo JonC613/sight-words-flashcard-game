@@ -30,3 +30,8 @@ test("limits the child-facing summary", () => {
   assert.equal(result.strengthened.length, 4);
   assert.deepEqual(result.practiceSoon, ["their", "write"]);
 });
+test("activity metadata cannot change mission rewards",()=>{
+  const baseline=summarizeMission([{word:"after",ok:true},{word:"could",ok:false}]);
+  const varied=summarizeMission([{word:"after",ok:true,mode:"missing-letter"},{word:"could",ok:false,mode:"word-hunt"}]);
+  assert.deepEqual(varied,baseline);
+});

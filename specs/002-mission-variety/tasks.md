@@ -24,7 +24,7 @@ independent goal and verification checkpoint.
 
 **Purpose**: Add the new test entry without changing production behavior.
 
-- [ ] T001 Create shared fixtures in `tests/mission-variety.test.mjs` and `tests/mission-session.test.mjs` and add both files to the `npm test` command in `package.json`
+- [x] T001 Create shared fixtures in `tests/mission-variety.test.mjs` and `tests/mission-session.test.mjs` and add both files to the `npm test` command in `package.json`
 
 **Checkpoint**: The existing test command discovers the new test file and all
 pre-feature tests still pass.
@@ -38,8 +38,8 @@ all three stories.
 
 **⚠️ CRITICAL**: Complete this phase before user-story implementation.
 
-- [ ] T002 Define the five activity constants, prompt/card JSDoc types, injected-random interface, and non-mutating helper boundaries in `app/mission-variety.js`
-- [ ] T003 Extend the `Mode`, `Progress`, and `Card` TypeScript types for `missing-letter`, `word-hunt`, and transient prompt data so both new modes count toward the unchanged three-distinct-mode mastery threshold in `app/page.tsx`
+- [x] T002 Define the five activity constants, prompt/card JSDoc types, injected-random interface, and non-mutating helper boundaries in `app/mission-variety.js`
+- [x] T003 Extend the `Mode`, `Progress`, and `Card` TypeScript types for `missing-letter`, `word-hunt`, and transient prompt data so both new modes count toward the unchanged three-distinct-mode mastery threshold in `app/page.tsx`
 
 **Checkpoint**: The application type-checks with old three-mode saves, and the
 pure module has no DOM, storage, speech, network, reward, or clock access.
@@ -60,17 +60,17 @@ outcome once, and appends a different-mode retry after a miss.
 
 > Write these tests first and confirm they fail before implementation.
 
-- [ ] T004 [US1] Add failing Missing Letter tests for two-letter words, apostrophes, repeated letters, one omitted position, exactly four distinct choices, one answer, deterministic randomness, and one-letter fallback in `tests/mission-variety.test.mjs`
-- [ ] T005 [US1] Add failing Word Hunt tests for two-to-four choices, one target, same-grade preference, introduced-only distractors, pairwise normalized Damerau-Levenshtein distance of at least two, deterministic randomness, and insufficient-distractor fallback in `tests/mission-variety.test.mjs`
-- [ ] T006 [US1] Add failing tests for base activity-card composition, immutable selected words/order, different-mode appended retry, retry-only-once behavior, and the 12-card cap in `tests/mission-variety.test.mjs`
+- [x] T004 [US1] Add failing Missing Letter tests for two-letter words, apostrophes, repeated letters, one omitted position, exactly four distinct choices, one answer, deterministic randomness, and one-letter fallback in `tests/mission-variety.test.mjs`
+- [x] T005 [US1] Add failing Word Hunt tests for two-to-four choices, one target, same-grade preference, introduced-only distractors, pairwise normalized Damerau-Levenshtein distance of at least two, deterministic randomness, and insufficient-distractor fallback in `tests/mission-variety.test.mjs`
+- [x] T006 [US1] Add failing tests for base activity-card composition, immutable selected words/order, different-mode appended retry, retry-only-once behavior, and the 12-card cap in `tests/mission-variety.test.mjs`
 
 ### Implementation for User Story 1
 
-- [ ] T007 [US1] Implement `createMissingLetterPrompt` and `createWordHuntPrompt` to satisfy the pure-state contract in `app/mission-variety.js`
-- [ ] T008 [US1] Implement initial eligible-activity assignment and `createRetryCard` with existing-mode fallback in `app/mission-variety.js`
-- [ ] T009 [US1] Integrate post-selection activity composition, both new card renderers, the guarded `answer(ok)` path, mode-history recording, and different-mode retry appending in `app/page.tsx`
-- [ ] T010 [P] [US1] Add Missing Letter and Word Hunt layout, 44px choice controls, disabled states, and shared feedback-compatible styling in `app/globals.css`
-- [ ] T011 [US1] Retain the initial-response smoke test and add source-contract assertions for both conditional activity instructions and native button renderers in `tests/rendered-html.test.mjs`
+- [x] T007 [US1] Implement `createMissingLetterPrompt` and `createWordHuntPrompt` to satisfy the pure-state contract in `app/mission-variety.js`
+- [x] T008 [US1] Implement initial eligible-activity assignment and `createRetryCard` with existing-mode fallback in `app/mission-variety.js`
+- [x] T009 [US1] Integrate post-selection activity composition, both new card renderers, the guarded `answer(ok)` path, mode-history recording, and different-mode retry appending in `app/page.tsx`
+- [x] T010 [P] [US1] Add Missing Letter and Word Hunt layout, 44px choice controls, disabled states, and shared feedback-compatible styling in `app/globals.css`
+- [x] T011 [US1] Retain the initial-response smoke test and add source-contract assertions for both conditional activity instructions and native button renderers in `tests/rendered-html.test.mjs`
 
 **Checkpoint**: User Story 1 works end-to-end as an MVP; existing star, stage,
 interval, mastery-threshold, finale, rescue, session, and Adventure Map behavior
@@ -92,15 +92,15 @@ no unseen Word Hunt distractors.
 
 > Write these tests first and confirm they fail before implementation.
 
-- [ ] T012 [US2] Add failing scheduler-isolation tests comparing selected word identity, order, due priority, and new-word limits before and after activity assignment in `tests/mission-variety.test.mjs`
-- [ ] T013 [US2] Add failing composition tests for guaranteed new-activity exposure, two-mode minimums, no avoidable third consecutive mode, eligibility fallback, and reproducible fixtures in `tests/mission-variety.test.mjs`
-- [ ] T014 [US2] Add the 100-mission SC-001/SC-002 acceptance fixture and activity-composition p95 timing helper in `tests/mission-variety.test.mjs`
+- [x] T012 [US2] Add failing scheduler-isolation tests comparing selected word identity, order, due priority, and new-word limits before and after activity assignment in `tests/mission-variety.test.mjs`
+- [x] T013 [US2] Add failing composition tests for guaranteed new-activity exposure, two-mode minimums, no avoidable third consecutive mode, eligibility fallback, and reproducible fixtures in `tests/mission-variety.test.mjs`
+- [x] T014 [US2] Add the 100-mission SC-001/SC-002 acceptance fixture and activity-composition p95 timing helper in `tests/mission-variety.test.mjs`
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Implement constrained least-used activity composition with new-activity reservation, consecutive-run prevention, and valid-prompt fallback in `app/mission-variety.js`
-- [ ] T016 [US2] Refactor `makeMission` into an unchanged scheduler-selection stage followed by activity composition while preserving repeated-new-word sequencing in `app/page.tsx`
-- [ ] T017 [US2] Add regression assertions that activity mix cannot alter completion rewards or Adventure Map transitions in `tests/mission-finale.test.mjs` and `tests/adventure-map.test.mjs`
+- [x] T015 [US2] Implement constrained least-used activity composition with new-activity reservation, consecutive-run prevention, and valid-prompt fallback in `app/mission-variety.js`
+- [x] T016 [US2] Refactor `makeMission` into an unchanged scheduler-selection stage followed by activity composition while preserving repeated-new-word sequencing in `app/page.tsx`
+- [x] T017 [US2] Add regression assertions that activity mix cannot alter completion rewards or Adventure Map transitions in `tests/mission-finale.test.mjs` and `tests/adventure-map.test.mjs`
 
 **Checkpoint**: User Stories 1 and 2 pass independently, and SC-001 through SC-004
 are automated.
@@ -121,14 +121,14 @@ completion reward or map progress after abandonment.
 
 > Write these tests first and confirm they fail before implementation.
 
-- [ ] T018 [US3] Add failing compatibility tests for old three-mode progress, JSON round trips with new modes, malformed or unknown mode-history entries, and introduced-word detection in `tests/mission-variety.test.mjs`
-- [ ] T019 [US3] Add failing pure-transition tests for rapid duplicate answers, learning updates, appended retries, abandonment without save mutation, and single-finale boundaries in `tests/mission-session.test.mjs`, `tests/mission-finale.test.mjs`, and `tests/adventure-map.test.mjs`
+- [x] T018 [US3] Add failing compatibility tests for old three-mode progress, JSON round trips with new modes, malformed or unknown mode-history entries, and introduced-word detection in `tests/mission-variety.test.mjs`
+- [x] T019 [US3] Add failing pure-transition tests for rapid duplicate answers, learning updates, appended retries, abandonment without save mutation, and single-finale boundaries in `tests/mission-session.test.mjs`, `tests/mission-finale.test.mjs`, and `tests/adventure-map.test.mjs`
 
 ### Implementation for User Story 3
 
-- [ ] T020 [US3] Implement pure guarded answer and abandonment transitions in `app/mission-session.js` and route repeated activation, learning updates, retries, visible sound-off instructions, and early exit through them in `app/page.tsx`
-- [ ] T021 [P] [US3] Add visible focus, narrow/tablet reflow, non-color states, and reduced-motion overrides for both activities in `app/globals.css`
-- [ ] T022 [US3] Extend source/CSS contract checks for labels, status semantics, disabled native controls, visible-focus selectors, reduced-motion rules, and horizontal-overflow regression selectors in `tests/rendered-html.test.mjs`
+- [x] T020 [US3] Implement pure guarded answer and abandonment transitions in `app/mission-session.js` and route repeated activation, learning updates, retries, visible sound-off instructions, and early exit through them in `app/page.tsx`
+- [x] T021 [P] [US3] Add visible focus, narrow/tablet reflow, non-color states, and reduced-motion overrides for both activities in `app/globals.css`
+- [x] T022 [US3] Extend source/CSS contract checks for labels, status semantics, disabled native controls, visible-focus selectors, reduced-motion rules, and horizontal-overflow regression selectors in `tests/rendered-html.test.mjs`
 - [ ] T023 [US3] Execute the 768×1024, 1024×768, and 320px touch/keyboard/sound-off/reduced-motion/offline/storage-failure matrix and record results in `specs/002-mission-variety/validation.md`
 
 **Checkpoint**: All three user stories are independently functional, old saves
@@ -141,11 +141,11 @@ remain valid, and SC-007/SC-008 have automated plus recorded manual evidence.
 **Purpose**: Validate the combined feature against learning, engagement, quality,
 performance, and release requirements.
 
-- [ ] T024 [P] Review all child-facing instructions, feedback, rewards, and retry behavior against Constitution Principles II/III and record the result in `specs/002-mission-variety/validation.md`
-- [ ] T025 Run `npm run lint` and `npm test`, resolve any failures in the affected `app/` or `tests/` files, and record final command results in `specs/002-mission-variety/validation.md`
+- [x] T024 [P] Review all child-facing instructions, feedback, rewards, and retry behavior against Constitution Principles II/III and record the result in `specs/002-mission-variety/validation.md`
+- [x] T025 Run `npm run lint` and `npm test`, resolve any failures in the affected `app/` or `tests/` files, and record final command results in `specs/002-mission-variety/validation.md`
 - [ ] T026 Measure 1,000 eight-card compositions and 20 warm-browser feedback interactions against the plan’s p95/100ms targets and record method/results in `specs/002-mission-variety/validation.md`
-- [ ] T027 Assign the product owner to complete the grown-up-consented five-child anonymous aggregate comprehension/comfort release gate for SC-005/SC-006, collecting no names or media, and record only aggregate results in `specs/002-mission-variety/validation.md`
-- [ ] T028 Verify every FR-001–FR-018 and SC-001–SC-008 has implementation or validation evidence and complete the traceability table in `specs/002-mission-variety/validation.md`
+- [x] T027 Assign the product owner to complete the grown-up-consented five-child anonymous aggregate comprehension/comfort release gate for SC-005/SC-006, collecting no names or media, and record only aggregate results in `specs/002-mission-variety/validation.md`
+- [x] T028 Verify every FR-001–FR-018 and SC-001–SC-008 has implementation or validation evidence and complete the traceability table in `specs/002-mission-variety/validation.md`
 
 ---
 
