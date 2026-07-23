@@ -8,6 +8,16 @@
 
 **Input**: User description: "Add two rotating, ADHD-friendly sight-word mission activities that preserve spaced repetition, mastery scoring, and pressure-free play."
 
+## Clarifications
+
+### Session 2026-07-23
+
+- Q: How should the learner supply the missing letter? → A: Choose the missing letter from 3–4 options.
+- Q: How often must a new activity appear in a mission? → A: Include at least one new activity whenever eligible.
+- Q: How should a word answered incorrectly in a new activity be retried? → A: Retry later using a different eligible activity.
+- Q: What is the minimum word length for Missing Letter? → A: Allow words with two or more letters.
+- Q: Which words may be used as Word Hunt distractors? → A: Use only previously introduced sight words.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Practice Through Varied Activities (Priority: P1)
@@ -29,15 +39,16 @@ supportive feedback, and advances through the existing mission.
 1. **Given** a learner has words selected for a mission, **When** the mission is
    composed, **Then** eligible words may be presented as Missing Letter or Word
    Hunt activities without changing the selected word set.
-2. **Given** a Missing Letter activity, **When** the learner chooses or enters the
-   missing letter correctly, **Then** the answer is recorded as correct and the
-   full word is reinforced.
+2. **Given** a Missing Letter activity with three or four letter choices, **When**
+   the learner selects the missing letter correctly, **Then** the answer is
+   recorded as correct and the full word is reinforced.
 3. **Given** a Word Hunt activity, **When** the learner selects the target word,
    **Then** the answer is recorded as correct and the learner receives immediate
    supportive feedback.
 4. **Given** an incorrect response in either activity, **When** feedback appears,
-   **Then** the full correct word is shown and the learner can continue without a
-   penalty, countdown, or loss state.
+   **Then** the full correct word is shown and the word returns later, within the
+   existing retry limit, using a different eligible activity without a penalty,
+   countdown, or loss state.
 
 ---
 
@@ -56,8 +67,9 @@ and the same selected words and review priorities are retained.
 
 **Acceptance Scenarios**:
 
-1. **Given** at least four mission cards, **When** activities are assigned,
-   **Then** the mission includes more than one activity type whenever eligible.
+1. **Given** at least four mission cards with a word eligible for a new activity,
+   **When** activities are assigned, **Then** the mission includes at least one
+   Missing Letter or Word Hunt card and more than one activity type.
 2. **Given** sufficient eligible alternatives, **When** activities are assigned,
    **Then** the same activity type does not appear more than twice consecutively.
 3. **Given** a word that cannot produce an unambiguous new activity, **When** its
@@ -98,13 +110,16 @@ answers, and feedback remain understandable and no extra rewards are granted.
 
 - Words with repeated letters must identify a single, unambiguous missing position
   or fall back to another activity.
-- Very short words must not create trivial or ambiguous Missing Letter prompts.
-- Distractor words in Word Hunt must be visually distinct, valid sight words, and
-  must not include duplicate answer choices.
-- When too few suitable distractors exist in the preferred grade, the activity
-  must use another existing activity rather than lower answer quality.
-- Retry cards must not create an endless loop or cause the mission to exceed its
-  existing maximum card count.
+- One-letter words are ineligible for Missing Letter. Words with two or more
+  letters remain eligible only when the prompt has exactly one valid answer.
+- Distractor words in Word Hunt must be previously introduced to the learner,
+  visually distinct, valid sight words, and must not include duplicate choices.
+- When too few suitable previously introduced distractors exist, the activity must
+  use another existing activity rather than use unseen words or lower answer
+  quality.
+- Retry cards must use a different eligible activity when one is available, fall
+  back to a suitable existing activity otherwise, and must not create an endless
+  loop or cause the mission to exceed its existing maximum card count.
 - Repeated taps or submissions must record only one answer for the current card.
 - Reloading, storage failure, or offline use must not reinterpret prior learning
   history or award completion rewards early.
@@ -141,17 +156,22 @@ answers, and feedback remain understandable and no extra rewards are granted.
 - **FR-003**: Activity assignment MUST NOT change due-word order, new-word limits,
   placement results, mastery thresholds, or review timing.
 - **FR-004**: Missing Letter MUST show enough of the target word to identify one
-  omitted letter position and MUST accept exactly one correct completion.
-- **FR-005**: Missing Letter MUST fall back to an existing activity when a clear,
-  age-appropriate prompt cannot be created.
+  omitted letter position and MUST present three or four selectable letter choices
+  containing exactly one correct completion.
+- **FR-005**: Missing Letter MUST accept words with two or more letters when a
+  clear prompt with exactly one valid answer can be created. One-letter words and
+  any word lacking such a prompt MUST fall back to an existing activity.
 - **FR-006**: Word Hunt MUST present one target sight word and a bounded set of two
   to four distinct written choices containing exactly one correct answer.
-- **FR-007**: Word Hunt distractors MUST be valid sight words and sufficiently
-  distinct to avoid duplicate or visually indistinguishable choices.
+- **FR-007**: Word Hunt distractors MUST be valid sight words already introduced
+  to the learner and sufficiently distinct to avoid duplicate or visually
+  indistinguishable choices. Unseen words MUST NOT be used as distractors.
 - **FR-008**: Each new activity MUST record correct and incorrect responses through
   the same learning outcome used by existing mission activities.
-- **FR-009**: Correct responses MUST preserve the existing per-answer reward, and
-  incorrect responses MUST preserve the existing supportive retry behavior.
+- **FR-009**: Correct responses MUST preserve the existing per-answer reward.
+  Incorrect responses MUST show the full correct word and preserve the existing
+  retry timing and limit; the retry MUST use a different eligible activity, or a
+  suitable existing-activity fallback when no different activity is eligible.
 - **FR-010**: A completed mission MUST retain the existing single completion bonus,
   rescue, session increment, and Adventure Map step behavior regardless of its
   activity mix.
@@ -160,7 +180,8 @@ answers, and feedback remain understandable and no extra rewards are granted.
 - **FR-012**: When eligible alternatives exist, the system MUST prevent any one
   activity type from appearing more than twice consecutively.
 - **FR-013**: A mission with at least four cards MUST use at least two activity
-  types when its selected words support them.
+  types and MUST include at least one Missing Letter or Word Hunt card when at
+  least one selected word is eligible for a new activity.
 - **FR-014**: New activity instructions and feedback MUST remain understandable
   with sound disabled and without animation.
 - **FR-015**: All required controls MUST support keyboard and touch operation,
@@ -191,7 +212,9 @@ answers, and feedback remain understandable and no extra rewards are granted.
 ### Measurable Outcomes
 
 - **SC-001**: In a representative set of at least 100 generated missions containing
-  four or more cards, 95% or more include at least two activity types.
+  four or more cards, every mission with at least one word eligible for a new
+  activity includes a Missing Letter or Word Hunt card, and 95% or more include
+  at least two activity types.
 - **SC-002**: In those missions, no activity appears more than twice consecutively
   when another eligible activity is available.
 - **SC-003**: Across boundary and duplicate-input tests, every displayed card
