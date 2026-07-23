@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wordling Release Check"
+  short_description: "Verify Wordling changes before release"
+  default_prompt: "Use $wordling-release-check to validate Wordling Rescue for release."

@@ -4,20 +4,24 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import AdventureMapView from "./adventure-map-view";
 import { chooseWorld, completeMission, markStoryViewed, normalizeAdventureMap, recordPlacementSuggestion, resolvePlacementSuggestion, selectAdventureMap } from "./adventure-map.js";
 import { COMPLETION_BONUS, summarizeMission } from "./mission-finale";
+import { composeMissionActivities } from "./mission-variety.js";
+import { abandonMission, applyMissionAnswer } from "./mission-session.js";
 import { Grade, learningOrder, lists, SightWord, words } from "./words";
 
-type Mode = "read" | "choice" | "spell";
+type Mode = "read" | "choice" | "spell" | "missing-letter" | "word-hunt";
 type View = "home" | "map" | "mission" | "finale" | "placement" | "collection" | "parent";
 type Progress = { stage:number; due:number; attempts:number; correct:number; modes:Mode[]; mastered:boolean };
 type Placement = { completed:boolean; completedAt:number; startingGrade:Grade; attempts:number; correct:number };
 type Rescue = { id:string; world:Grade; rescuedAt:number };
 type Save = { name:string; stars:number; sessions:number; sound:boolean; progress:Record<string,Progress>; placement?:Placement; rescues?:Rescue[]; adventureMap?:unknown };
-type Card = { word:SightWord; mode:Mode; retry?:boolean };
+type MissingLetterPrompt = { kind:"missing-letter"; displayParts:[string,string]; missingIndex:number; choices:string[]; answer:string };
+type WordHuntPrompt = { kind:"word-hunt"; target:string; choices:string[] };
+type Card = { word:SightWord; mode:Mode; retry?:boolean; prompt?:MissingLetterPrompt|WordHuntPrompt };
 type PlacementAnswer = { word:SightWord; mode:Mode; ok:boolean };
 type MissionAnswer = { word:string; ok:boolean };
 type MissionResult = { strengthened:string[]; practiceSoon:string[]; starsEarned:number; rescue:Rescue };
 
-const DAY=86_400_000, intervals=[0,1,3,7,14,30,60];
+const DAY=86_400_000;
 const fresh:Save={name:"Explorer",stars:0,sessions:0,sound:true,progress:{}};
 const shuffle=<T,>(a:T[])=>[...a].sort(()=>Math.random()-.5);
 const placementWords:Record<Grade,string[]>={First:["after","could","every","think"],Second:["because","around","their","write"],Third:["better","carry","together","laugh"]};
@@ -30,11 +34,10 @@ function makeMission(progress:Save["progress"]):Card[]{
   const due=words.filter(w=>progress[w.word]?.due<=now).sort((a,b)=>progress[a.word].due-progress[b.word].due).slice(0,5);
   const included=new Set(due.map(w=>w.word));
   const newWords=learningOrder.filter((w,i,a)=>a.indexOf(w)===i).filter(w=>!progress[w]&&!included.has(w)).slice(0,3).map(n=>words.find(w=>w.word===n)!).filter(Boolean);
-  const modes:Mode[]=["choice","read","spell"];
-  const cards:Card[]=[...due,...newWords].map((word,i)=>({word,mode:modes[i%3]}));
+  const selected=[...due,...newWords].map(word=>({word}));
   let i=0;
-  while(cards.length<8&&newWords.length){const word=newWords[i%newWords.length];const used=cards.filter(c=>c.word.word===word.word).map(c=>c.mode);cards.push({word,mode:modes.find(m=>!used.includes(m))??modes[i%3]});i++}
-  return cards.slice(0,10);
+  while(selected.length<8&&newWords.length){selected.push({word:newWords[i%newWords.length]});i++}
+  return composeMissionActivities(selected.slice(0,10),{progress,allWords:words}) as Card[];
 }
 function say(text:string,on=true){if(!on||typeof window==="undefined"||!("speechSynthesis" in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=.78;u.pitch=1.05;speechSynthesis.speak(u)}
 function Creature({small=false}:{small?:boolean}){return <div className={"creature "+(small?"small":"")} aria-hidden="true"><i className="ear l"/><i className="ear r"/><i className="eye l"/><i className="eye r"/><i className="smile"/>{!small&&<b>✦</b>}</div>}
@@ -60,7 +63,8 @@ export default function Page(){
   function nextPlacement(){const nextIndex=placementIndex+1;if(nextIndex===4&&placementCards.length===4){const branch:Grade=placementAnswers.filter(a=>a.ok).length>=3?"Third":"First";setPlacementCards(c=>[...c,...placementSet(branch)])}if(nextIndex>=8){finishPlacement(placementAnswers,placementCards[4]?.word.grade??"First");return}setPlacementIndex(nextIndex);setPlacementFeedback(null);setTyped("")}
   function checkPlacement(e:FormEvent){e.preventDefault();if(typed.trim())answerPlacement(typed.trim().toLowerCase()===placementCurrent.word.word)}
   const placementComplete=!!save.placement?.completed;
-  function answer(ok:boolean){if(!current||feedback)return;const name=current.word.word;setMissionAnswers(a=>[...a,{word:name,ok}]);const old=save.progress[name]??{stage:0,due:Date.now(),attempts:0,correct:0,modes:[],mastered:false};const stage=ok?Math.min(6,old.stage+1):Math.max(0,old.stage-1),modes=Array.from(new Set([...old.modes,current.mode]));setSave(s=>({...s,stars:s.stars+(ok?3:1),progress:{...s.progress,[name]:{stage,due:ok?Date.now()+intervals[stage]*DAY:Date.now(),attempts:old.attempts+1,correct:old.correct+(ok?1:0),modes,mastered:stage>=5&&modes.length>=3}}}));if(!ok&&!current.retry&&cards.length<12)setCards(c=>[...c,{word:current.word,mode:"read",retry:true}]);setFeedback({ok,answer:name});if(ok)say("Great remembering!",save.sound)}
+  function answer(ok:boolean){if(!current||feedback)return;const name=current.word.word;const result=applyMissionAnswer({save,card:current,cards,ok,now:Date.now(),alreadyAnswered:!!feedback,context:{progress:save.progress,allWords:words}});if(!result.accepted)return;setMissionAnswers(a=>[...a,{word:name,ok}]);setSave(result.save as Save);if(result.retryCard)setCards(c=>[...c,result.retryCard as Card]);setFeedback({ok,answer:name});if(ok)say("Great remembering!",save.sound)}
+  function leaveMission(){const cleared=abandonMission({cards,answers:missionAnswers,feedback,completion:missionResult});setCards(cleared.cards);setMissionAnswers(cleared.answers);setFeedback(cleared.feedback);setMissionResult(cleared.completion);setIndex(0);setTyped("");setView("home")}
   function finishMission(){if(finalizing.current)return;finalizing.current=true;const {strengthened,practiceSoon,starsEarned}=summarizeMission(missionAnswers),world=(selectAdventureMap(save).activeWorld??save.placement?.startingGrade??"First") as Grade,rescuedAt=Date.now(),rescue:Rescue={id:"rescue-"+missionId.current,world,rescuedAt};setMissionResult({strengthened,practiceSoon,starsEarned,rescue});setSave(s=>completeMission(s,{id:missionId.current,completedAt:rescuedAt,completionBonusStars:COMPLETION_BONUS,rescue}) as Save);setCards([]);setView("finale");say("Mission complete! A Wordling is home!",save.sound)}
   function next(){if(index+1>=cards.length){finishMission();return}setIndex(i=>i+1);setFeedback(null);setTyped("")}
   function check(e:FormEvent){e.preventDefault();if(typed.trim())answer(typed.trim().toLowerCase()===current.word.word)}
@@ -93,10 +97,12 @@ export default function Page(){
       {placementPhase==="result"&&<div className="placementResult"><div className={"trailBadge trail"+placementGrade}><Creature/></div><small className="eyebrow">YOUR TRAIL IS READY</small><h1>{worldName(placementGrade)}</h1><p>Your Wordling found a great place to start. Daily missions will keep adjusting as you learn—so the trail always fits you.</p><div className="resultNote"><b>✦ Your first mission is ready</b><span>Words you know will return later. Words that need practice will return sooner.</span></div><button className="primary" onClick={()=>setView("map")}>Open my Adventure Map →</button></div>}
     </section>}
 
-    {view==="mission"&&current&&<section className="mission"><div className="missionbar"><button aria-label="Leave mission" onClick={()=>setView("home")}>×</button><div><i style={{width:(index+(feedback?1:0))/cards.length*100+"%"}}/></div><b>{index+1}/{cards.length}</b></div><div className="stage"><div className="coach"><Creature small/>{current.retry?"Let’s give this word another boost!":current.mode==="read"?"Say this word out loud.":current.mode==="choice"?"Listen, then find the word.":"Spell the word you hear."}</div>
-      {current.mode==="read"&&<div className="flash"><small>{current.word.grade} grade</small><strong>{current.word.word}</strong><button onClick={()=>say(current.word.word)}>♪ Hear the word</button></div>}
-      {current.mode==="choice"&&<div className="question"><button className="listen" onClick={()=>say(current.word.word)}>♪ &nbsp; Hear the word</button><div className="choices">{choices.map(w=><button disabled={!!feedback} onClick={()=>answer(w.word===current.word.word)} key={w.word}>{w.word}</button>)}</div></div>}
-      {current.mode==="spell"&&<form className="question spelling" onSubmit={check}><button type="button" className="listen" onClick={()=>say(current.word.word)}>♪ &nbsp; Hear the word</button><label htmlFor="spell">Type the word</label><input id="spell" autoCapitalize="none" autoComplete="off" value={typed} onChange={e=>setTyped(e.target.value)} disabled={!!feedback}/>{!feedback&&<button className="primary" disabled={!typed.trim()}>Check my word</button>}</form>}
+    {view==="mission"&&current&&<section className="mission"><div className="missionbar"><button aria-label="Leave mission" onClick={leaveMission}>×</button><div><i style={{width:(index+(feedback?1:0))/cards.length*100+"%"}}/></div><b>{index+1}/{cards.length}</b></div><div className="stage"><div className="coach"><Creature small/>{current.retry?"Let’s give this word another boost!":current.mode==="read"?"Say this word out loud.":current.mode==="choice"?"Listen, then find the word.":current.mode==="missing-letter"?"Find the missing letter.":current.mode==="word-hunt"?"Find this word.":"Spell the word you hear."}</div>
+      {current.mode==="read"&&<div className="flash"><small>{current.word.grade} grade</small><strong>{current.word.word}</strong><button onClick={()=>say(current.word.word,save.sound)}>♪ Hear the word</button></div>}
+      {current.mode==="choice"&&<div className="question"><button className="listen" onClick={()=>say(current.word.word,save.sound)}>♪ &nbsp; Hear the word</button><div className="choices">{choices.map(w=><button disabled={!!feedback} onClick={()=>answer(w.word===current.word.word)} key={w.word}>{w.word}</button>)}</div></div>}
+      {current.mode==="spell"&&<form className="question spelling" onSubmit={check}><button type="button" className="listen" onClick={()=>say(current.word.word,save.sound)}>♪ &nbsp; Hear the word</button><label htmlFor="spell">Type the word</label><input id="spell" autoCapitalize="none" autoComplete="off" value={typed} onChange={e=>setTyped(e.target.value)} disabled={!!feedback}/>{!feedback&&<button className="primary" disabled={!typed.trim()}>Check my word</button>}</form>}
+      {current.mode==="missing-letter"&&current.prompt?.kind==="missing-letter"&&<div className="question missingLetter"><p className="activityInstruction">Find the missing letter</p><div className="missingWord" aria-label="Word with one missing letter"><span>{current.prompt.displayParts[0]}</span><b aria-label="missing letter">_</b><span>{current.prompt.displayParts[1]}</span></div><div className="letterChoices">{current.prompt.choices.map(letter=><button type="button" disabled={!!feedback} onClick={()=>answer(letter===current.prompt?.answer)} key={letter}>{letter}</button>)}</div></div>}
+      {current.mode==="word-hunt"&&current.prompt?.kind==="word-hunt"&&<div className="question wordHunt"><p className="activityInstruction">Find this word</p><strong className="wordHuntTarget">{current.prompt.target}</strong><button type="button" className="listen" onClick={()=>say(current.word.word,save.sound)}>♪ &nbsp; Hear the word</button><div className="wordHuntChoices">{current.prompt.choices.map(choice=><button type="button" disabled={!!feedback} onClick={()=>answer(choice===current.word.word)} key={choice}>{choice}</button>)}</div></div>}
       {!feedback&&current.mode==="read"&&<div className="selfcheck"><button onClick={()=>answer(false)}>Show me</button><button className="primary" onClick={()=>answer(true)}>I knew it!</button></div>}
       {feedback&&<div className={"feedback "+(feedback.ok?"good":"help")} role="status"><div><b>{feedback.ok?"Brilliant remembering!":"Let’s map it together."}</b><span>{feedback.ok?"“"+feedback.answer+"” grew stronger.":"The word is “"+feedback.answer+"”. Say it, then trace the letters."}</span></div><button className="primary" onClick={next}>{index+1>=cards.length?"Finish mission":"Next word"} →</button></div>}
     </div></section>}

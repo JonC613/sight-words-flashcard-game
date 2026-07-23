@@ -9,3 +9,17 @@ test("collection view class cannot collide with the word-card grid",()=>{
   assert.doesNotMatch(page,/className="collection"/);
   assert.doesNotMatch(css,/\.collection(?![A-Za-z0-9_-])/);
 });
+test("mission variety renderers and accessibility styles stay in the source contract",()=>{
+  const page=readFileSync(new URL("../app/page.tsx",import.meta.url),"utf8");
+  const css=readFileSync(new URL("../app/globals.css",import.meta.url),"utf8");
+  assert.match(page,/Find the missing letter/);
+  assert.match(page,/Find this word/);
+  assert.match(page,/className="letterChoices"/);
+  assert.match(page,/className="wordHuntChoices"/);
+  assert.match(page,/<button type="button" disabled=\{!!feedback\}/);
+  assert.match(page,/role="status"/);
+  assert.match(css,/\.letterChoices button:focus-visible/);
+  assert.match(css,/\.wordHuntChoices button:focus-visible/);
+  assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
+  assert.match(css,/@media\(max-width:520px\).*\.letterChoices/s);
+});
