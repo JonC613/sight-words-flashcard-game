@@ -81,14 +81,9 @@ Guarantees:
 
 ## Outcome boundary
 
-The module never applies an answer. Every rendered activity calls the existing
-guarded application answer path:
-
-```text
-active card + no feedback -> answer(ok) -> one Progress update
-feedback already present -> ignore duplicate input
-```
-
-Activity choice does not alter stars, stage bounds, review intervals, mastery
-threshold, mission completion, rescue creation, session count, or Adventure Map
-progression.
+This module never applies an answer. Every rendered activity passes its card and
+answer to the pure mission-session boundary defined in
+[mission-session-state.md](./mission-session-state.md). Activity choice does not
+alter star amounts, stage bounds, review intervals, the three-distinct-mode
+mastery threshold, mission completion, rescue creation, session count, or
+Adventure Map progression.

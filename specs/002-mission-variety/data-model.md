@@ -18,9 +18,9 @@ type ActivityMode =
   | "word-hunt";
 ```
 
-The first three values retain their existing behavior. The two new values are
-recorded as distinct practice modes and participate in the existing
-`modes.length >= 3` mastery rule without changing that threshold.
+The first three values retain their existing behavior. Missing Letter and Word
+Hunt each count as one distinct practice mode toward the existing
+`modes.length >= 3` mastery rule; the numeric threshold remains unchanged.
 
 ## Existing persisted entities
 
@@ -157,9 +157,9 @@ function reads the clock, storage, DOM, speech, or network.
 | Word Hunt composed | At least one introduced distractor exists | Attach prompt and mode | One target; no unseen distractors |
 | New activity ineligible | Prompt cannot satisfy constraints | Choose another eligible existing activity | No low-quality prompt |
 | Incorrect new activity | No prior retry and card count below 12 | Append same word with another eligible mode | Retry timing/cap unchanged |
-| Answer submitted | Card active and feedback absent | Call existing answer transition once | One outcome and reward |
-| Duplicate submission | Feedback already present | Ignore input | No duplicate outcome |
-| Mission abandoned | Mission incomplete | Discard transient cards/prompts | No completion reward or map step |
+| Answer submitted | Card active and feedback absent | Apply pure mission-session answer transition once | One outcome and reward |
+| Duplicate submission | Feedback already present | Pure session transition rejects input | No duplicate outcome |
+| Mission abandoned | Mission incomplete | Apply pure abandonment transition and discard transient cards/prompts | Save unchanged; no completion reward or map step |
 | Mission completed | All cards resolved | Use existing finale transition | One bonus, rescue, session, map step |
 
 ## Composition invariants

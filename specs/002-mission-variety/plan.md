@@ -8,10 +8,11 @@
 
 Add Missing Letter and Word Hunt to the existing Read, Choice, and Spell mission
 rotation without changing which words are selected or when they are reviewed.
-Keep due/new-word scheduling in `page.tsx`, then use a dependency-free pure
-JavaScript module to generate valid prompts, balance activity assignment, and
-choose different-mode retries. Render both activities through the existing guarded
-answer, feedback, reward, finale, save, and Adventure Map paths.
+Keep due/new-word scheduling in `page.tsx`, then use dependency-free pure
+JavaScript modules to generate valid prompts, balance activity assignment, choose
+different-mode retries, and guard answer/abandonment transitions. Render both
+activities through the existing feedback, reward, finale, save, and Adventure Map
+paths.
 
 ## Technical Context
 
@@ -21,7 +22,7 @@ answer, feedback, reward, finale, save, and Adventure Map paths.
 
 **Storage**: Existing browser `localStorage` key `wordling-rescue-v1`; compatible new string values in `Progress.modes`; transient mission prompts; no database, remote records, or analytics
 
-**Testing**: Node built-in `node:test` and `assert`, production vinext build, rendered-worker smoke test, ESLint, deterministic composition fixtures, and documented tablet/accessibility/usability checks
+**Testing**: Node built-in `node:test` and `assert`, pure mission-session transition tests, production vinext build, initial-response smoke test, source/CSS contract checks for conditional mission UI, ESLint, deterministic composition fixtures, and documented tablet/accessibility/usability checks
 
 **Target Platform**: Modern tablet browsers in portrait and landscape, responsive mobile/desktop browsers, Cloudflare Workers-hosted PWA with offline fallback
 
@@ -75,6 +76,7 @@ specs/002-mission-variety/
 ├── quickstart.md
 ├── contracts/
 │   ├── mission-variety-state.md
+│   ├── mission-session-state.md
 │   └── mission-variety-ui.md
 └── tasks.md
 ```
@@ -84,6 +86,7 @@ specs/002-mission-variety/
 ```text
 app/
 ├── mission-variety.js       # pure eligibility, prompt, composition, retry rules
+├── mission-session.js       # pure answer guard, learning update, abandonment
 ├── page.tsx                 # scheduler boundary, state integration, activity UI
 ├── words.ts                 # existing Dolch catalog and learning order
 ├── globals.css              # new prompt, choice, focus, and responsive styles
@@ -93,9 +96,10 @@ app/
 
 tests/
 ├── mission-variety.test.mjs # prompt, composition, fallback, retry invariants
+├── mission-session.test.mjs # duplicate answer, learning, abandonment invariants
 ├── adventure-map.test.mjs   # existing progression and completion regression
 ├── mission-finale.test.mjs  # existing reward/summary regression
-└── rendered-html.test.mjs   # production response and activity-copy smoke checks
+└── rendered-html.test.mjs   # initial response plus source/CSS UI contract checks
 
 package.json                 # include the new Node test in npm test
 public/sw.js                 # existing offline shell; no planned behavior change
@@ -107,7 +111,8 @@ public/sw.js                 # existing offline shell; no planned behavior chang
 deterministic activity rules in an importable JavaScript module, matching the
 existing Adventure Map and mission-finale test pattern. Keep word scheduling and
 all learning/reward state transitions in their current integration boundary, with
-only presentation and retry-card selection delegated to the new module.
+presentation and retry-card selection delegated to the variety module and the
+existing answer/abandonment transition delegated to the session module.
 
 ## Phase 0: Research Decisions
 
@@ -128,16 +133,19 @@ pipeline. All technical unknowns are resolved.
   retain at least two modes, and avoid a third consecutive identical mode.
 - Append a missed new word once using a different eligible activity within the
   existing retry timing and 12-card cap.
-- Route all five activities through the same duplicate-guarded answer and feedback
-  transition.
+- Route all five activities through a pure duplicate-guarded session transition
+  that preserves the current learning formulas and clears abandonment state without
+  completion side effects.
 - Add semantic tablet controls and responsive styles without depending on audio,
   animation, network, or successful persistence.
-- Extend unit and production-render tests; retain the existing build, GitHub
-  Actions, and Cloudflare deployment path.
+- Extend pure unit tests and source/CSS UI contract checks while retaining the
+  initial-response smoke test, existing build, GitHub Actions, and Cloudflare
+  deployment path.
 
 Detailed entities and transitions are in [data-model.md](./data-model.md).
 Pure-state and UI contracts are in
-[contracts/mission-variety-state.md](./contracts/mission-variety-state.md) and
+[contracts/mission-variety-state.md](./contracts/mission-variety-state.md),
+[contracts/mission-session-state.md](./contracts/mission-session-state.md), and
 [contracts/mission-variety-ui.md](./contracts/mission-variety-ui.md).
 
 ## Post-Design Constitution Re-check

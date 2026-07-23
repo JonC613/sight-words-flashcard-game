@@ -18,8 +18,9 @@ novelty from changing spaced repetition, new-word limits, or review priority.
 ## Decision 2: Use a pure JavaScript rules module
 
 **Decision**: Add `app/mission-variety.js` with `// @ts-check` for eligibility,
-prompt generation, balanced composition, and retry selection. Accept an injected
-random function for reproducible tests.
+prompt generation, balanced composition, and retry selection. Add
+`app/mission-session.js` as the pure answer/abandonment transition used by React.
+Accept injected randomness and time for reproducible tests.
 
 **Rationale**: The repository already tests pure JavaScript modules with
 `node:test`. This adds no framework or runtime dependency and keeps `page.tsx`
@@ -29,8 +30,9 @@ focused on React state and rendering.
 
 - Put all rules in `page.tsx`: rejected because UI coupling would make scheduler
   invariants and boundary cases harder to test.
-- Add a browser test framework: deferred because pure rules plus the existing
-  production-render smoke test cover the highest-risk behavior.
+- Add a browser test framework: deferred because pure activity/session rules,
+  source/CSS contract checks, the existing initial-response smoke test, and a
+  focused manual browser matrix cover the highest-risk behavior.
 
 ## Decision 3: Represent five activity types in the existing mode history
 
@@ -115,9 +117,10 @@ fresh retrieval cue instead of the same frustrating interaction.
 
 ## Decision 8: Keep feedback and rewards on the existing answer path
 
-**Decision**: All activities call the existing guarded `answer(ok)` path. Keep
-per-answer stars, stages, due dates, attempts, mission summary, completion bonus,
-rescue, and Adventure Map transitions unchanged.
+**Decision**: Extract the existing guarded learning update into
+`app/mission-session.js`. All activities call that pure boundary, which rejects an
+already-answered card and preserves per-answer stars, stages, due dates, attempts,
+mission summary, completion bonus, rescue, and Adventure Map behavior.
 
 **Rationale**: One outcome boundary preserves duplicate-submission protection and
 prevents activity-specific reward drift.

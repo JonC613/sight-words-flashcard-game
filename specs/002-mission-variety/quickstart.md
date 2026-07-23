@@ -13,14 +13,17 @@ runtime dependency is required.
 
 1. Add pure eligibility, prompt, composition, and retry functions in
    `app/mission-variety.js`.
-2. Add `tests/mission-variety.test.mjs` and include it in `npm test`.
-3. Extend mission mode/card types and integrate composition after existing word
-   selection in `app/page.tsx`.
+2. Add `tests/mission-variety.test.mjs` and `tests/mission-session.test.mjs` and
+   include both in `npm test`.
+3. Add the pure guarded answer and abandonment transitions in
+   `app/mission-session.js`, then extend mission mode/card types and integrate both
+   pure modules in `app/page.tsx`.
 4. Render Missing Letter and Word Hunt prompts through the existing guarded answer
    and feedback path.
 5. Add responsive, focus, disabled, and reduced-motion styles in
    `app/globals.css`.
-6. Extend the rendered-worker smoke test.
+6. Retain the initial rendered-worker smoke test and add source/CSS contract checks
+   for mission-only controls.
 7. Run automated and manual acceptance checks.
 
 ## Local development
@@ -56,7 +59,7 @@ The Mission Variety unit tests must cover:
 - Injected randomness produces deterministic fixtures.
 - Incorrect new activities append one different-mode retry within the existing
   12-card cap.
-- Duplicate submissions record one outcome.
+- Duplicate submissions record one outcome through the pure session transition.
 - Existing star, interval, mastery, finale, rescue, and Adventure Map behaviors
   remain unchanged.
 

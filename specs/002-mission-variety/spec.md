@@ -154,7 +154,9 @@ answers, and feedback remain understandable and no extra rewards are granted.
 - **FR-002**: The system MUST assign activities only after the established learning
   process has selected the mission's words.
 - **FR-003**: Activity assignment MUST NOT change due-word order, new-word limits,
-  placement results, mastery thresholds, or review timing.
+  placement results, the mastery threshold of three distinct activity modes, or
+  review timing. Missing Letter and Word Hunt each count as a distinct activity
+  mode toward that unchanged threshold.
 - **FR-004**: Missing Letter MUST show enough of the target word to identify one
   omitted letter position and MUST present three or four selectable letter choices
   containing exactly one correct completion.

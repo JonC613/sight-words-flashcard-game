@@ -24,7 +24,7 @@ independent goal and verification checkpoint.
 
 **Purpose**: Add the new test entry without changing production behavior.
 
-- [ ] T001 Create the shared Mission Variety test fixtures in `tests/mission-variety.test.mjs` and add that file to the `npm test` command in `package.json`
+- [ ] T001 Create shared fixtures in `tests/mission-variety.test.mjs` and `tests/mission-session.test.mjs` and add both files to the `npm test` command in `package.json`
 
 **Checkpoint**: The existing test command discovers the new test file and all
 pre-feature tests still pass.
@@ -39,7 +39,7 @@ all three stories.
 **⚠️ CRITICAL**: Complete this phase before user-story implementation.
 
 - [ ] T002 Define the five activity constants, prompt/card JSDoc types, injected-random interface, and non-mutating helper boundaries in `app/mission-variety.js`
-- [ ] T003 Extend the `Mode`, `Progress`, and `Card` TypeScript types for `missing-letter`, `word-hunt`, and transient prompt data without changing save keys or mastery thresholds in `app/page.tsx`
+- [ ] T003 Extend the `Mode`, `Progress`, and `Card` TypeScript types for `missing-letter`, `word-hunt`, and transient prompt data so both new modes count toward the unchanged three-distinct-mode mastery threshold in `app/page.tsx`
 
 **Checkpoint**: The application type-checks with old three-mode saves, and the
 pure module has no DOM, storage, speech, network, reward, or clock access.
@@ -70,7 +70,7 @@ outcome once, and appends a different-mode retry after a miss.
 - [ ] T008 [US1] Implement initial eligible-activity assignment and `createRetryCard` with existing-mode fallback in `app/mission-variety.js`
 - [ ] T009 [US1] Integrate post-selection activity composition, both new card renderers, the guarded `answer(ok)` path, mode-history recording, and different-mode retry appending in `app/page.tsx`
 - [ ] T010 [P] [US1] Add Missing Letter and Word Hunt layout, 44px choice controls, disabled states, and shared feedback-compatible styling in `app/globals.css`
-- [ ] T011 [US1] Add production-render smoke assertions for both activity instructions and semantic native controls in `tests/rendered-html.test.mjs`
+- [ ] T011 [US1] Retain the initial-response smoke test and add source-contract assertions for both conditional activity instructions and native button renderers in `tests/rendered-html.test.mjs`
 
 **Checkpoint**: User Story 1 works end-to-end as an MVP; existing star, stage,
 interval, mastery-threshold, finale, rescue, session, and Adventure Map behavior
@@ -122,13 +122,13 @@ completion reward or map progress after abandonment.
 > Write these tests first and confirm they fail before implementation.
 
 - [ ] T018 [US3] Add failing compatibility tests for old three-mode progress, JSON round trips with new modes, malformed optional prompt data, and introduced-word detection in `tests/mission-variety.test.mjs`
-- [ ] T019 [US3] Add failing rapid-submission, abandoned-mission, single-finale, and save-failure regression coverage using the existing testable boundaries in `tests/mission-variety.test.mjs`, `tests/mission-finale.test.mjs`, and `tests/adventure-map.test.mjs`
+- [ ] T019 [US3] Add failing pure-transition tests for rapid duplicate answers, learning updates, appended retries, abandonment without save mutation, and single-finale boundaries in `tests/mission-session.test.mjs`, `tests/mission-finale.test.mjs`, and `tests/adventure-map.test.mjs`
 
 ### Implementation for User Story 3
 
-- [ ] T020 [US3] Harden new activity controls against repeated activation, preserve visible sound-off instructions, and keep abandonment free of finale side effects in `app/page.tsx`
+- [ ] T020 [US3] Implement pure guarded answer and abandonment transitions in `app/mission-session.js` and route repeated activation, learning updates, retries, visible sound-off instructions, and early exit through them in `app/page.tsx`
 - [ ] T021 [P] [US3] Add visible focus, narrow/tablet reflow, non-color states, and reduced-motion overrides for both activities in `app/globals.css`
-- [ ] T022 [US3] Extend production-render checks for labels, status semantics, keyboard-native controls, and horizontal-overflow regression selectors in `tests/rendered-html.test.mjs`
+- [ ] T022 [US3] Extend source/CSS contract checks for labels, status semantics, disabled native controls, visible-focus selectors, reduced-motion rules, and horizontal-overflow regression selectors in `tests/rendered-html.test.mjs`
 - [ ] T023 [US3] Execute the 768×1024, 1024×768, and 320px touch/keyboard/sound-off/reduced-motion/offline/storage-failure matrix and record results in `specs/002-mission-variety/validation.md`
 
 **Checkpoint**: All three user stories are independently functional, old saves
@@ -197,7 +197,7 @@ Task T010: Add activity styling in app/globals.css
 ## Parallel Example: User Story 3
 
 ```text
-Task T020: Harden interaction and abandonment behavior in app/page.tsx
+Task T020: Implement the session transition in app/mission-session.js and integrate it in app/page.tsx
 Task T021: Add focus, responsive, and reduced-motion styles in app/globals.css
 ```
 
