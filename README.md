@@ -16,6 +16,25 @@ npm run dev
 npm run build
 ```
 
+## Spec-Driven Development
+
+This project uses GitHub Spec Kit. Project principles live in
+`.specify/memory/constitution.md`, and each planned feature receives a numbered
+directory under `specs/` containing its specification, plan, and tasks.
+
+In Codex, use the project skills in this order:
+
+```text
+$speckit-constitution
+$speckit-specify
+$speckit-clarify
+$speckit-plan
+$speckit-checklist
+$speckit-tasks
+$speckit-analyze
+$speckit-implement
+```
+
 This starter does not use `wrangler.jsonc`.
 
 ## Included Shape
