@@ -205,3 +205,28 @@ test("activity metadata cannot change Adventure Map completion",()=>{
   const varied=completeMission(save,{...base,activityMix:["missing-letter","word-hunt"]});
   assert.deepEqual(varied,plain);
 });
+test("daily practice updates only for accepted mission completions", () => {
+  const completedAt = new Date(2026, 6, 23, 12).getTime();
+  const save = withSteps({ Second: 0 });
+  const result = completeMission(save, { ...completion("daily-1"), completedAt });
+  assert.deepEqual(result.practiceDays, ["2026-07-23"]);
+  assert.equal(result.stars, save.stars + 5);
+  assert.equal(result.sessions, save.sessions + 1);
+  assert.equal(result.rescues.length, save.rescues.length + 1);
+  assert.equal(result.adventureMap.worlds.Second.steps, 1);
+  const duplicate = completeMission(result, { ...completion("daily-1"), completedAt });
+  assert.strictEqual(duplicate, result);
+  assert.deepEqual(duplicate.practiceDays, ["2026-07-23"]);
+  assert.strictEqual(abandonMission(result), result);
+});
+
+test("same-day missions count one practice day without changing rewards", () => {
+  const completedAt = new Date(2026, 6, 23, 12).getTime();
+  const first = completeMission(withSteps({ Second: 0 }), { ...completion("daily-a"), completedAt });
+  const second = completeMission(first, { ...completion("daily-b"), completedAt: completedAt + 60_000 });
+  assert.deepEqual(second.practiceDays, ["2026-07-23"]);
+  assert.equal(second.sessions, 2);
+  assert.equal(second.stars, 22);
+  assert.equal(second.rescues.length, 2);
+  assert.equal(second.adventureMap.worlds.Second.steps, 2);
+});
