@@ -23,3 +23,21 @@ test("mission variety renderers and accessibility styles stay in the source cont
   assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
   assert.match(css,/@media\(max-width:520px\).*\.letterChoices/s);
 });
+test("gentle daily goal stays pressure-free and accessible in the source contract",()=>{
+  const page=readFileSync(new URL("../app/page.tsx",import.meta.url),"utf8");
+  const css=readFileSync(new URL("../app/globals.css",import.meta.url),"utf8");
+  assert.match(page,/TODAY’S GENTLE GOAL/);
+  assert.match(page,/Today’s gentle goal is complete!/);
+  assert.match(page,/More practice is (always )?optional/);
+  assert.match(page,/Practice rhythm/);
+  assert.match(page,/current streak/);
+  assert.match(page,/best streak/);
+  assert.match(page,/practice days/);
+  assert.match(page,/role="status"/);
+  assert.doesNotMatch(page,/broken streak|streak repair|streak expires|countdown/i);
+  assert.match(css,/\.dailyGoal/);
+  assert.match(css,/\.dailyGoalCelebration/);
+  assert.match(css,/\.practiceNumbers/);
+  assert.match(css,/@media\(max-width:800px\).*\.dailyGoal/s);
+  assert.match(css,/@media\(prefers-reduced-motion:reduce\).*\.dailyGoalCelebration/s);
+});

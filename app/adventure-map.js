@@ -1,6 +1,7 @@
 // @ts-check
 
 import { COMPLETION_BONUS } from "./mission-finale.js";
+import { recordPracticeDay } from "./daily-practice.js";
 
 export const WORLD_IDS = ["First", "Second", "Third"];
 
@@ -206,7 +207,7 @@ export function completeMission(save, event) {
   const rescue = event.rescue && typeof event.rescue === "object"
     ? { ...event.rescue, world: activeWorld }
     : undefined;
-  return {
+  const completed = {
     ...normalized,
     stars: (Number(normalized.stars) || 0) + COMPLETION_BONUS,
     sessions: (Number(normalized.sessions) || 0) + 1,
@@ -217,6 +218,7 @@ export function completeMission(save, event) {
       lastCompletionId: event.id,
     },
   };
+  return recordPracticeDay(completed, Number(event.completedAt)).save;
 }
 
 export function markStoryViewed(save, storyId) {
